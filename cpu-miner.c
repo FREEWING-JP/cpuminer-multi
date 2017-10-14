@@ -1524,6 +1524,9 @@ static void show_version_and_exit(void) {
 #if defined(__x86_64__) && defined(USE_XOP)
             " XOP"
 #endif
+#if defined(__aarch64__)
+            " ARM64"
+#endif
 #if defined(USE_ASM) && defined(__arm__) && defined(__APCS_32__)
             " ARM"
 #if defined(__ARM_ARCH_5E__) || defined(__ARM_ARCH_5TE__) || \
@@ -1818,7 +1821,7 @@ static void signal_handler(int sig) {
 }
 #endif
 
-#ifndef __arm__
+#if !defined(__arm__) && !defined(__aarch64__)
 static inline int cpuid(int code, uint32_t where[4]) {
 	asm volatile("cpuid":"=a"(*where),"=b"(*(where+1)),
 			"=c"(*(where+2)),"=d"(*(where+3)):"a"(code));
@@ -1828,7 +1831,7 @@ static inline int cpuid(int code, uint32_t where[4]) {
 
 static bool has_aes_ni()
 {
-	#ifdef __arm__
+	#if defined(__arm__) || defined(__aarch64__)
 	return false;
 	#else
 	uint32_t cpu_info[4];
